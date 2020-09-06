@@ -56,7 +56,7 @@ clean:
 
 qtest:
 	@echo "Perform quick tests ..."
-	@go test $(VERBOSE) -coverprofile=.coverage/coverage.out -run TestLdapConfig ./*.go
+	@go test $(VERBOSE) -coverprofile=.coverage/coverage.out -run TestCaddyfile ./*.go
 
 dep:
 	@echo "Making dependencies check ..."

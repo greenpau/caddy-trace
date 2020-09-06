@@ -8,7 +8,17 @@ Request Debugging Middleware Plugin for [Caddy v2](https://github.com/caddyserve
 
 ## Overview
 
-The purpose ...
+The plugin is a middleware which displays the content of the request it
+handles. It helps troubleshooting web requests by exposing headers
+(e.g. cookies), URL parameters, etc.
+
+For background, the idea for the creation of plugin came during a
+development of another plugin which rewrites headers of web requests.
+There was a need to compare "before and after" content of the request.
+
+The `request_debug` directive gets inserted prior to the plugin which
+modifies a request and immediately after it. The log with the content
+of the request show up twice and it is easy to compare the two.
 
 ## Getting Started
 
