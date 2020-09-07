@@ -38,7 +38,9 @@ type RequestDebugger struct {
 	Disabled bool `json:"disabled,omitempty"`
 	// Generate UUIDs for requests
 	EnableUUID bool `json:"enable_uuid,omitempty"`
-	logger     *zap.Logger
+	// Adds a tag to a log message
+	Tag    string `json:"log_level,tag"`
+	logger *zap.Logger
 }
 
 // CaddyModule returns the Caddy module information.

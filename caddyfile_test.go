@@ -16,12 +16,14 @@ func TestCaddyfile(t *testing.T) {
 
     localhost:9080 {
       route /* {
-	    request_debug
-	    request_debug
-  	    respond /version 200 {
-	      body "1.0.0"
-	    }
-	  }
+        request_debug disabled=yes
+        request_debug enable_uuid=no
+        request_debug enable_uuid=yes log_level=debug disabled=no tag="foo"
+        request_debug enable_uuid=yes log_level=debug disabled=no tag="bar"
+        respond /version 200 {
+          body "1.0.0"
+        }
+      }
     }
     `, "caddyfile")
 

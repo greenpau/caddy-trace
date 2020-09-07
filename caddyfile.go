@@ -16,26 +16,18 @@ package debug
 
 import (
 	"fmt"
-	//"encoding/json"
-	//"strconv"
-	//"strings"
-
-	//"github.com/caddyserver/caddy/v2"
-	//"github.com/caddyserver/caddy/v2/caddyconfig"
 	"github.com/caddyserver/caddy/v2/caddyconfig/httpcaddyfile"
 	"github.com/caddyserver/caddy/v2/modules/caddyhttp"
+	"strings"
 )
 
 func init() {
-	//httpcaddyfile.RegisterHandlerDirective("uri", parseCaddyfileRequestDebugger)
 	httpcaddyfile.RegisterHandlerDirective("request_debug", parseCaddyfileRequestDebugger)
 }
 
 // parseCaddyfileRequestDebugger sets up a handler for debugging http requests. Syntax:
 //
 //     request_debug [log_level <debug|info|warn|error>] [disabled <yes|no>] [enable_uuid <yes|no>]
-//     uri [<matcher>] strip_prefix|strip_suffix|replace <target> [<replacement> [<limit>]]
-//
 //
 // The disabled is being set to true, there will be no output from the plugin.
 // If enable_uuid is being set to true, then the plugin adds request_id field to
@@ -51,57 +43,61 @@ func parseCaddyfileRequestDebugger(h httpcaddyfile.Helper) (caddyhttp.Middleware
 			return dbg, nil
 		}
 
-		if len(args) > 0 {
-			return nil, fmt.Errorf("the number of elements is %d", len(args))
-
-		}
-
-		/*
-			switch args[0] {
-			case "strip_prefix":
-				if len(args) > 2 {
-					return nil, h.ArgErr()
-				}
-				dbg.StripPathPrefix = args[1]
-				if !strings.HasPrefix(dbg.StripPathPrefix, "/") {
-					dbg.StripPathPrefix = "/" + dbg.StripPathPrefix
-				}
-			case "strip_suffix":
-				if len(args) > 2 {
-					return nil, h.ArgErr()
-				}
-				dbg.StripPathSuffix = args[1]
-			case "replace":
-				var find, replace, lim string
-				switch len(args) {
-				case 4:
-					lim = args[3]
-					fallthrough
-				case 3:
-					find = args[1]
-					replace = args[2]
-				default:
-					return nil, h.ArgErr()
-				}
-
-				var limInt int
-				if lim != "" {
-					var err error
-					limInt, err = strconv.Atoi(lim)
-					if err != nil {
-						return nil, h.Errf("limit must be an integer; invalid: %v", err)
-					}
-				}
-
-				dbg.URISubstring = append(dbg.URISubstring, replacer{
-					Find:    find,
-					Replace: replace,
-					Limit:   limInt,
-				})
-			default:
-				return nil, h.Errf("unrecognized URI manipulation '%s'", args[0])
+		for _, arg := range args {
+			parts := strings.SplitN(arg, "=", 2)
+			if len(parts) != 2 {
+				return nil, fmt.Errorf("unsupported argument: %s", arg)
 			}
-		*/
+			k := parts[0]
+			v := strings.Trim(parts[1], "\"")
+			switch k {
+			case "log_level":
+				switch v {
+				case "debug":
+				case "info":
+				case "warn":
+				case "error":
+					dbg.LogLevel = v
+				default:
+					return nil, fmt.Errorf("%s argument value of %s is unsupported", k, v)
+				}
+			case "tag":
+				dbg.Tag = v
+			case "disabled":
+				if !isSwitchArg(v) {
+					return nil, fmt.Errorf("%s argument value of %s is unsupported", k, v)
+				}
+				if isEnabledArg(v) {
+					dbg.Disabled = true
+				}
+			case "enable_uuid":
+				if !isSwitchArg(v) {
+					return nil, fmt.Errorf("%s argument value of %s is unsupported", k, v)
+				}
+				if isEnabledArg(v) {
+					dbg.EnableUUID = true
+				}
+			default:
+				return nil, fmt.Errorf("unsupported argument: %s", arg)
+			}
+		}
 	}
 	return dbg, nil
+}
+
+func isEnabledArg(s string) bool {
+	if s == "yes" || s == "true" || s == "on" {
+		return true
+	}
+	return false
+}
+
+func isSwitchArg(s string) bool {
+	if s == "yes" || s == "true" || s == "on" {
+		return true
+	}
+	if s == "no" || s == "false" || s == "off" {
+		return true
+	}
+	return false
 }
