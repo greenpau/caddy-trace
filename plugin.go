@@ -15,12 +15,15 @@
 package debug
 
 import (
+	"github.com/satori/go.uuid"
 	"net/http"
 
+	//"fmt"
 	"github.com/caddyserver/caddy/v2"
 	"github.com/caddyserver/caddy/v2/modules/caddyhttp"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
+	//"net/http/httputil"
 	"os"
 )
 
@@ -39,7 +42,7 @@ type RequestDebugger struct {
 	// Generate UUIDs for requests
 	EnableUUID bool `json:"enable_uuid,omitempty"`
 	// Adds a tag to a log message
-	Tag    string `json:"log_level,tag"`
+	Tag    string `json:"tag,omitempty"`
 	logger *zap.Logger
 }
 
@@ -69,10 +72,23 @@ func (dbg RequestDebugger) ServeHTTP(w http.ResponseWriter, r *http.Request, nex
 }
 
 func (dbg *RequestDebugger) debug(r *http.Request) {
+	requestID := r.Context().Value("request_id")
+	if requestID == nil {
+		requestID = uuid.NewV4().String()
+	}
+
 	dbg.logger.Debug("request debugging",
+		zap.Any("request_id", requestID),
+		zap.String("tag", dbg.Tag),
 		zap.String("method", r.Method),
 		zap.String("uri", r.RequestURI),
 	)
+
+	/*
+		if reqDump, err := httputil.DumpRequest(r, true); err == nil {
+			dbg.logger.Debug(fmt.Sprintf("request: %s", reqDump))
+		}
+	*/
 }
 
 func initLogger() *zap.Logger {
