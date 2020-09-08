@@ -87,6 +87,6 @@ logo:
 	@mkdir -p assets/docs/images
 	@gm convert -background black -font Bookman-Demi \
 		-size 640x320 "xc:black" \
+		-pointsize 32 \
 		-draw "fill white gravity center text 0,0 'caddy\nrequest-debug'" \
-		-pointsize 72 \
 		assets/docs/images/logo.png
