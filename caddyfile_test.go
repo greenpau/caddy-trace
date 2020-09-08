@@ -23,6 +23,7 @@ func TestCaddyfile(t *testing.T) {
         respond /version 200 {
           body "1.0.0"
         }
+        request_debug enable_uuid=yes log_level=debug disabled=no tag="marvel"
       }
     }
     `, "caddyfile")
