@@ -17,16 +17,19 @@ func TestCaddyfile(t *testing.T) {
     localhost:9080 {
       route /* {
         request_debug disabled=yes
-        request_debug enable_uuid=no
-        request_debug enable_uuid=yes log_level=debug disabled=no tag="foo"
-        request_debug enable_uuid=yes log_level=debug disabled=no tag="bar"
+        request_debug disabled=no tag="foo"
+        request_debug disabled=no tag="bar"
         respond /version 200 {
           body "1.0.0"
         }
-        request_debug enable_uuid=yes log_level=debug disabled=no tag="marvel"
+        request_debug tag="marvel"
+		respond /whoami 200 {
+          body "greenpau"
+        }
       }
     }
     `, "caddyfile")
 
 	tester.AssertGetResponse("http://localhost:9080/version", 200, "1.0.0")
+	tester.AssertGetResponse("http://localhost:9080/whoami", 200, "greenpau")
 }

@@ -54,7 +54,7 @@ clean:
 	@rm -rf .coverage
 	@rm -rf bin/
 
-qtest:
+qtest: covdir
 	@echo "Perform quick tests ..."
 	@go test $(VERBOSE) -coverprofile=.coverage/coverage.out -run TestCaddyfile ./*.go
 

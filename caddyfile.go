@@ -37,12 +37,9 @@ func parseCaddyfileRequestDebugger(h httpcaddyfile.Helper) (caddyhttp.Middleware
 	for h.Next() {
 		args := h.RemainingArgs()
 		if len(args) == 0 {
-			dbg.LogLevel = "error"
 			dbg.Disabled = false
-			dbg.EnableUUID = true
 			return dbg, nil
 		}
-
 		for _, arg := range args {
 			parts := strings.SplitN(arg, "=", 2)
 			if len(parts) != 2 {
@@ -51,16 +48,6 @@ func parseCaddyfileRequestDebugger(h httpcaddyfile.Helper) (caddyhttp.Middleware
 			k := parts[0]
 			v := strings.Trim(parts[1], "\"")
 			switch k {
-			case "log_level":
-				switch v {
-				case "debug":
-				case "info":
-				case "warn":
-				case "error":
-					dbg.LogLevel = v
-				default:
-					return nil, fmt.Errorf("%s argument value of %s is unsupported", k, v)
-				}
 			case "tag":
 				dbg.Tag = v
 			case "disabled":
@@ -69,13 +56,6 @@ func parseCaddyfileRequestDebugger(h httpcaddyfile.Helper) (caddyhttp.Middleware
 				}
 				if isEnabledArg(v) {
 					dbg.Disabled = true
-				}
-			case "enable_uuid":
-				if !isSwitchArg(v) {
-					return nil, fmt.Errorf("%s argument value of %s is unsupported", k, v)
-				}
-				if isEnabledArg(v) {
-					dbg.EnableUUID = true
 				}
 			default:
 				return nil, fmt.Errorf("unsupported argument: %s", arg)
