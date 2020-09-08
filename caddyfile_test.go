@@ -23,9 +23,7 @@ func TestCaddyfile(t *testing.T) {
         request_debug disabled=yes
         request_debug disabled=no tag="foo"
         request_debug disabled=no tag="bar"
-        respond /version 200 {
-          body "1.0.0"
-        }
+        respond /version "1.0.0" 200
         request_debug tag="marvel"
 		respond /whoami* 200 {
           body "greenpau"
