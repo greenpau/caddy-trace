@@ -19,7 +19,7 @@ func TestCaddyfile(t *testing.T) {
     }
 
     localhost:9080 {
-      route /* {
+      route {
         request_debug disabled=yes
         request_debug disabled=no tag="foo"
         request_debug disabled=no tag="bar"

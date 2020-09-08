@@ -53,7 +53,7 @@ times because `respond /version` will not terminate the handling of the plugin.
 }
 
 localhost:9080 {
-  route /* {
+  route {
     request_debug disabled=yes
     request_debug disabled=no tag="foo"
     request_debug disabled=no tag="bar"
@@ -151,18 +151,11 @@ The same JSON configuration:
                               "match": [
                                 {
                                   "path": [
-                                    "/whoami"
+                                    "/whoami*"
                                   ]
                                 }
                               ]
                             }
-                          ]
-                        }
-                      ],
-                      "match": [
-                        {
-                          "path": [
-                            "/*"
                           ]
                         }
                       ]
@@ -186,4 +179,3 @@ The same JSON configuration:
   }
 }
 ```
-
