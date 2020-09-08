@@ -88,5 +88,5 @@ logo:
 	@gm convert -background black -font Bookman-Demi \
 		-size 640x320 "xc:black" \
 		-draw "fill white gravity center text 0,0 'caddy\nrequest-debug'" \
-		-pointsize 96 \
+		-pointsize 72 \
 		assets/docs/images/logo.png
