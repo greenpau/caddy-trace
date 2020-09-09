@@ -32,11 +32,13 @@ of the request show up twice and it is easy to compare the two.
 
 Add `request_debug` handler to enable this plugin.
 
-The `disabled=yes` disables the operation of the plugin.
+The `disabled=yes` argument disables the operation of the plugin.
 
 The `tag` argument injects the value in the log output. This way, one can have
 multiple handlers and there is a way to deferentiate between them.
 
+The `response_debug` argument instructs the plugin to buffer
+responses and log response related metadata, i.e. status codes, length, etc.
 
 When a request arrives for `/version`, the plugin will be triggered two (2)
 times. The first handler is disables. The two (2) other handlers will trigger
@@ -45,6 +47,8 @@ with `marvel` tag will not trigger.
 
 When a request arrives for `/whoami`, the plugin will be triggered three (2)
 times because `respond /version` will not terminate the handling of the plugin.
+Notably, the plugin will output response metadata due to the presence of
+`response_debug` argument.
 
 ```
 {
@@ -57,10 +61,8 @@ localhost:9080 {
     request_debug disabled=yes
     request_debug disabled=no tag="foo"
     request_debug disabled=no tag="bar"
-    respond /version 200 {
-      body "1.0.0"
-    }
-    request_debug tag="marvel"
+    respond /version "1.0.0" 200
+    request_debug tag="marvel" response_debug=yes
     respond /whoami 200 {
       body "greenpau"
     }
@@ -136,6 +138,7 @@ The same JSON configuration:
                               "handle": [
                                 {
                                   "handler": "request_debug",
+                                  "response_debug_enabled": true,
                                   "tag": "marvel"
                                 }
                               ]

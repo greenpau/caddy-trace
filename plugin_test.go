@@ -30,7 +30,7 @@ func TestRequestDebugger(t *testing.T) {
 		},
 	} {
 		tc.dbg.logger = initLogger()
-		tc.dbg.debug(tc.input, "incoming")
+		tc.dbg.debugRequest(tc.input)
 		t.Logf("PASS: Test %d", i)
 	}
 }
