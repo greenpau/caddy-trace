@@ -57,6 +57,13 @@ func parseCaddyfileRequestDebugger(h httpcaddyfile.Helper) (caddyhttp.Middleware
 				if isEnabledArg(v) {
 					dbg.Disabled = true
 				}
+			case "response_debug":
+				if !isSwitchArg(v) {
+					return nil, fmt.Errorf("%s argument value of %s is unsupported", k, v)
+				}
+				if isEnabledArg(v) {
+					dbg.ResponseDebugEnabled = true
+				}
 			default:
 				return nil, fmt.Errorf("unsupported argument: %s", arg)
 			}

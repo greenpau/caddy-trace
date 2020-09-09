@@ -15,6 +15,7 @@
 package debug
 
 import (
+	"bytes"
 	"github.com/caddyserver/caddy/v2"
 	"github.com/caddyserver/caddy/v2/modules/caddyhttp"
 	"github.com/satori/go.uuid"
@@ -37,8 +38,10 @@ type RequestDebugger struct {
 	// Enables or disables the plugin.
 	Disabled bool `json:"disabled,omitempty"`
 	// Adds a tag to a log message
-	Tag    string `json:"tag,omitempty"`
-	logger *zap.Logger
+	Tag string `json:"tag,omitempty"`
+	// Adds response buffering and debugging
+	ResponseDebugEnabled bool `json:"response_debug_enabled,omitempty"`
+	logger               *zap.Logger
 }
 
 // CaddyModule returns the Caddy module information.
@@ -58,16 +61,57 @@ func (dbg *RequestDebugger) Provision(ctx caddy.Context) error {
 	return nil
 }
 
-func (dbg RequestDebugger) ServeHTTP(w http.ResponseWriter, r *http.Request, next caddyhttp.Handler) error {
+func (dbg RequestDebugger) ServeHTTP(resp http.ResponseWriter, req *http.Request, next caddyhttp.Handler) error {
 	if dbg.Disabled {
-		return next.ServeHTTP(w, r)
+		return next.ServeHTTP(resp, req)
 	}
-	dbg.debug(r, "incoming")
-	return next.ServeHTTP(w, r)
+	dbg.debugRequest(req)
+	if dbg.ResponseDebugEnabled {
+		buf := new(bytes.Buffer)
+		shouldBuffer := func(status int, header http.Header) bool {
+			return true
+		}
+		wrapResp := caddyhttp.NewResponseRecorder(resp, buf, shouldBuffer)
+		err := next.ServeHTTP(wrapResp, req)
+		if err != nil {
+			return err
+		}
+		if !wrapResp.Buffered() {
+			return nil
+		}
+		dbg.debugResponse(req, wrapResp)
+		wrapResp.WriteResponse()
+		return nil
+	}
+	return next.ServeHTTP(resp, req)
 }
 
-func (dbg *RequestDebugger) debug(r *http.Request, reqDirection string) {
+func (dbg *RequestDebugger) debugResponse(req *http.Request, resp caddyhttp.ResponseRecorder) {
 	var requestID string
+	direction := "outgoing"
+	rawRequestID := caddyhttp.GetVar(req.Context(), "request_id")
+	if rawRequestID != nil {
+		requestID = rawRequestID.(string)
+	}
+	bufferSize := 0
+	if resp.Buffer() != nil {
+		bufferSize = resp.Buffer().Len()
+	}
+
+	dbg.logger.Debug(
+		"debugging response",
+		zap.Any("request_id", requestID),
+		zap.String("direction", direction),
+		zap.String("tag", dbg.Tag),
+		zap.Int("status_code", resp.Status()),
+		zap.Int("response_size", resp.Size()),
+		zap.Int("buffer_size", bufferSize),
+	)
+}
+
+func (dbg *RequestDebugger) debugRequest(r *http.Request) {
+	var requestID string
+	reqDirection := "incoming"
 	rawRequestID := caddyhttp.GetVar(r.Context(), "request_id")
 	if rawRequestID == nil {
 		requestID = uuid.NewV4().String()
