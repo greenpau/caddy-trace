@@ -47,7 +47,7 @@ type RequestDebugger struct {
 // CaddyModule returns the Caddy module information.
 func (RequestDebugger) CaddyModule() caddy.ModuleInfo {
 	return caddy.ModuleInfo{
-		ID:  "http.handlers.request_debug",
+		ID:  "http.handlers.trace",
 		New: func() caddy.Module { return new(RequestDebugger) },
 	}
 }

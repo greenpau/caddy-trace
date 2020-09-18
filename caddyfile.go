@@ -22,12 +22,12 @@ import (
 )
 
 func init() {
-	httpcaddyfile.RegisterHandlerDirective("request_debug", parseCaddyfileRequestDebugger)
+	httpcaddyfile.RegisterHandlerDirective("trace", parseCaddyfileRequestDebugger)
 }
 
 // parseCaddyfileRequestDebugger sets up a handler for debugging http requests. Syntax:
 //
-//     request_debug [log_level <debug|info|warn|error>] [disabled <yes|no>] [enable_uuid <yes|no>]
+//     trace [log_level <debug|info|warn|error>] [disabled <yes|no>] [enable_uuid <yes|no>]
 //
 // The disabled is being set to true, there will be no output from the plugin.
 // If enable_uuid is being set to true, then the plugin adds request_id field to

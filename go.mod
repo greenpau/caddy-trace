@@ -1,4 +1,4 @@
-module github.com/greenpau/caddy-request-debug
+module github.com/greenpau/caddy-trace
 
 go 1.14
 

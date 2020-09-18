@@ -20,11 +20,11 @@ func TestCaddyfile(t *testing.T) {
 
     localhost:9080 {
       route {
-        request_debug disabled=yes
-        request_debug disabled=no tag="foo"
-        request_debug disabled=no tag="bar"
+        trace disabled=yes
+        trace disabled=no tag="foo"
+        trace disabled=no tag="bar"
         respond /version "1.0.0" 200
-        request_debug tag="marvel" response_debug=yes
+        trace tag="marvel" response_debug=yes
         respond /whoami* 200 {
           body "greenpau"
         }

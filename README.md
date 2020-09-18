@@ -1,7 +1,7 @@
-# caddy-request-debug
+# caddy-trace
 
-<a href="https://github.com/greenpau/caddy-request-debug/actions/" target="_blank"><img src="https://github.com/greenpau/caddy-request-debug/workflows/build/badge.svg?branch=main"></a>
-<a href="https://pkg.go.dev/github.com/greenpau/caddy-request-debug" target="_blank"><img src="https://img.shields.io/badge/godoc-reference-blue.svg"></a>
+<a href="https://github.com/greenpau/caddy-trace/actions/" target="_blank"><img src="https://github.com/greenpau/caddy-trace/workflows/build/badge.svg?branch=main"></a>
+<a href="https://pkg.go.dev/github.com/greenpau/caddy-trace" target="_blank"><img src="https://img.shields.io/badge/godoc-reference-blue.svg"></a>
 <a href="https://caddy.community" target="_blank"><img src="https://img.shields.io/badge/community-forum-ff69b4.svg"></a>
 
 Request Debugging Middleware Plugin for [Caddy v2](https://github.com/caddyserver/caddy).
@@ -24,13 +24,13 @@ For background, the idea for the creation of plugin came during a
 development of another plugin which rewrites headers of web requests.
 There was a need to compare "before and after" content of the request.
 
-The `request_debug` directive gets inserted prior to the plugin which
+The `trace` directive gets inserted prior to the plugin which
 modifies a request and immediately after it. The log with the content
 of the request show up twice and it is easy to compare the two.
 
 ## Getting Started
 
-Add `request_debug` handler to enable this plugin.
+Add `trace` handler to enable this plugin.
 
 The `disabled=yes` argument disables the operation of the plugin.
 
@@ -58,11 +58,11 @@ Notably, the plugin will output response metadata due to the presence of
 
 localhost:9080 {
   route {
-    request_debug disabled=yes
-    request_debug disabled=no tag="foo"
-    request_debug disabled=no tag="bar"
+    trace disabled=yes
+    trace disabled=no tag="foo"
+    trace disabled=no tag="bar"
     respond /version "1.0.0" 200
-    request_debug tag="marvel" response_debug=yes
+    trace tag="marvel" response_debug=yes
     respond /whoami 200 {
       body "greenpau"
     }
@@ -98,14 +98,14 @@ The same JSON configuration:
                               "handle": [
                                 {
                                   "disabled": true,
-                                  "handler": "request_debug"
+                                  "handler": "trace"
                                 }
                               ]
                             },
                             {
                               "handle": [
                                 {
-                                  "handler": "request_debug",
+                                  "handler": "trace",
                                   "tag": "foo"
                                 }
                               ]
@@ -113,7 +113,7 @@ The same JSON configuration:
                             {
                               "handle": [
                                 {
-                                  "handler": "request_debug",
+                                  "handler": "trace",
                                   "tag": "bar"
                                 }
                               ]
@@ -137,7 +137,7 @@ The same JSON configuration:
                             {
                               "handle": [
                                 {
-                                  "handler": "request_debug",
+                                  "handler": "trace",
                                   "response_debug_enabled": true,
                                   "tag": "marvel"
                                 }

@@ -1,5 +1,5 @@
 .PHONY: test ctest covdir coverage docs linter qtest clean dep release logo
-PLUGIN_NAME="caddy-request-debug"
+PLUGIN_NAME="caddy-trace"
 PLUGIN_VERSION:=$(shell cat VERSION | head -1)
 GIT_COMMIT:=$(shell git describe --dirty --always)
 GIT_BRANCH:=$(shell git rev-parse --abbrev-ref HEAD -- | head -1)
@@ -21,7 +21,7 @@ all:
 	@rm -rf ../xcaddy-$(PLUGIN_NAME)/*
 	@mkdir -p ../xcaddy-$(PLUGIN_NAME) && cd ../xcaddy-$(PLUGIN_NAME) && \
 		xcaddy build $(CADDY_VERSION) --output ../$(PLUGIN_NAME)/bin/caddy \
-		--with github.com/greenpau/caddy-request-debug@$(LATEST_GIT_COMMIT)=$(BUILD_DIR) \
+		--with github.com/greenpau/caddy-trace@$(LATEST_GIT_COMMIT)=$(BUILD_DIR) \
 		--with github.com/greenpau/caddy-auth@latest=$(BUILD_DIR)/../caddy-auth
 	@#bin/caddy run -environ -config assets/conf/config.json
 
@@ -88,5 +88,5 @@ logo:
 	@gm convert -background black -font Bookman-Demi \
 		-size 640x320 "xc:black" \
 		-pointsize 72 \
-		-draw "fill white gravity center text 0,0 'caddy\nrequest-debug'" \
+		-draw "fill white gravity center text 0,0 'caddy\ntrace'" \
 		assets/docs/images/logo.png
