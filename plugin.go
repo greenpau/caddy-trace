@@ -173,6 +173,19 @@ func (dbg *RequestDebugger) debugRequest(r *http.Request) {
 		}
 	}
 
+	// Extract Form
+	form := make(map[string]interface{})
+	if r.Header != nil {
+		if r.Method == "POST" &&
+			r.Header.Get("Content-Type") == "application/x-www-form-urlencoded" &&
+			r.ContentLength < 1000 {
+			r.ParseForm()
+			for k, v := range r.Form {
+				form[k] = v
+			}
+		}
+	}
+
 	dbg.logger.Debug(
 		"debugging request",
 		zap.Any("request_id", requestID),
@@ -192,6 +205,7 @@ func (dbg *RequestDebugger) debugRequest(r *http.Request) {
 		zap.Any("cookies", cookies),
 		zap.Any("query_params", queryParams),
 		zap.Any("headers", reqHeaders),
+		zap.Any("form", form),
 	)
 
 }
