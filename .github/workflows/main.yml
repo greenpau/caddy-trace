@@ -27,10 +27,12 @@ jobs:
       id: go
     - name: Check out code into the Go module directory
       uses: actions/checkout@v2
-    - name: Setup Environment
+    - name: Amend Environment Path
       run: |
         mkdir -p /home/runner/.local/bin
-        echo "::add-path::/home/runner/.local/bin"
+        echo "/home/runner/.local/bin" >> $GITHUB_PATH
+    - name: Setup Environment
+      run: |
         mkdir -p .coverage
         echo "*** Current Directory ***"
         pwd
@@ -44,16 +46,19 @@ jobs:
     - name: Install prerequisites
       run: |
         sudo apt-get --assume-yes install make
+        sudo apt-get --assume-yes install libnss3-tools
         sudo apt-get update
     - name: Install Go modules
       run: |
-        go get -u golang.org/x/lint/golint
+        make dep
     - name: Validate prerequisites
       run: |
         echo "*** Local binaries ***"
         find /home/runner/.local/bin
     - name: Run tests
-      run: make test
+      run: |
+        make test || true
+        make test
     - name: Generate coverage report
       run: make coverage
     - name: Upload coverage report
