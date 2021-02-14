@@ -25,6 +25,7 @@ func TestCaddyfile(t *testing.T) {
         trace disabled=no tag="bar"
         respond /version "1.0.0" 200
         trace tag="marvel" response_debug=yes
+		trace tag="custom" response_debug=yes uri_filter="^/whoami$"
         respond /whoami* 200 {
           body "greenpau"
         }

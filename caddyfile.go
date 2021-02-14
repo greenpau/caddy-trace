@@ -18,6 +18,7 @@ import (
 	"fmt"
 	"github.com/caddyserver/caddy/v2/caddyconfig/httpcaddyfile"
 	"github.com/caddyserver/caddy/v2/modules/caddyhttp"
+	"regexp"
 	"strings"
 )
 
@@ -63,6 +64,11 @@ func parseCaddyfileRequestDebugger(h httpcaddyfile.Helper) (caddyhttp.Middleware
 				}
 				if isEnabledArg(v) {
 					dbg.ResponseDebugEnabled = true
+				}
+			case "uri_filter":
+				dbg.URIFilter = v
+				if _, err := regexp.CompilePOSIX(dbg.URIFilter); err != nil {
+					return nil, fmt.Errorf("%s directive value of %s fails to compile: %s", k, v, err)
 				}
 			default:
 				return nil, fmt.Errorf("unsupported argument: %s", arg)

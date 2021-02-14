@@ -41,6 +41,9 @@ multiple handlers and there is a way to deferentiate between them.
 The `response_debug` argument instructs the plugin to buffer
 responses and log response related metadata, i.e. status codes, length, etc.
 
+The `uri_filter` directive instructs the plugin to intercepts only
+the requests with the URI matching the regular expression in the filter.
+
 When a request arrives for `/version`, the plugin will be triggered two (2)
 times. The first handler is disables. The two (2) other handlers will trigger
 with different tags. The `respond` handler is terminal and it means the handler
@@ -64,121 +67,9 @@ localhost:9080 {
     trace disabled=no tag="bar"
     respond /version "1.0.0" 200
     trace tag="marvel" response_debug=yes
+    trace tag="custom" response_debug=yes uri_filter="^/whoami$"
     respond /whoami 200 {
       body "greenpau"
-    }
-  }
-}
-```
-
-The same JSON configuration:
-
-```json
-{
-  "apps": {
-    "http": {
-      "http_port": 9080,
-      "https_port": 9443,
-      "servers": {
-        "srv0": {
-          "listen": [
-            ":9080"
-          ],
-          "routes": [
-            {
-              "handle": [
-                {
-                  "handler": "subroute",
-                  "routes": [
-                    {
-                      "handle": [
-                        {
-                          "handler": "subroute",
-                          "routes": [
-                            {
-                              "handle": [
-                                {
-                                  "disabled": true,
-                                  "handler": "trace"
-                                }
-                              ]
-                            },
-                            {
-                              "handle": [
-                                {
-                                  "handler": "trace",
-                                  "tag": "foo"
-                                }
-                              ]
-                            },
-                            {
-                              "handle": [
-                                {
-                                  "handler": "trace",
-                                  "tag": "bar"
-                                }
-                              ]
-                            },
-                            {
-                              "handle": [
-                                {
-                                  "body": "1.0.0",
-                                  "handler": "static_response",
-                                  "status_code": 200
-                                }
-                              ],
-                              "match": [
-                                {
-                                  "path": [
-                                    "/version"
-                                  ]
-                                }
-                              ]
-                            },
-                            {
-                              "handle": [
-                                {
-                                  "handler": "trace",
-                                  "response_debug_enabled": true,
-                                  "tag": "marvel"
-                                }
-                              ]
-                            },
-                            {
-                              "handle": [
-                                {
-                                  "body": "greenpau",
-                                  "handler": "static_response",
-                                  "status_code": 200
-                                }
-                              ],
-                              "match": [
-                                {
-                                  "path": [
-                                    "/whoami*"
-                                  ]
-                                }
-                              ]
-                            }
-                          ]
-                        }
-                      ]
-                    }
-                  ]
-                }
-              ],
-              "match": [
-                {
-                  "host": [
-                    "localhost"
-                  ]
-                }
-              ],
-              "terminal": true
-            }
-          ]
-        }
-      }
     }
   }
 }

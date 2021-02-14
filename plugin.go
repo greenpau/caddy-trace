@@ -16,6 +16,7 @@ package debug
 
 import (
 	"bytes"
+	"fmt"
 	"github.com/caddyserver/caddy/v2"
 	"github.com/caddyserver/caddy/v2/modules/caddyhttp"
 	"github.com/satori/go.uuid"
@@ -24,6 +25,7 @@ import (
 	"net"
 	"net/http"
 	"os"
+	"regexp"
 	"strconv"
 )
 
@@ -41,7 +43,12 @@ type RequestDebugger struct {
 	Tag string `json:"tag,omitempty"`
 	// Adds response buffering and debugging
 	ResponseDebugEnabled bool `json:"response_debug_enabled,omitempty"`
-	logger               *zap.Logger
+	// If URIFilter is not empty, then only the plugin
+	// intercepts only the pages matching the regular expression
+	// in the filter
+	URIFilter        string `json:"uri_filter,omitempty"`
+	filterURIPattern *regexp.Regexp
+	logger           *zap.Logger
 }
 
 // CaddyModule returns the Caddy module information.
@@ -57,6 +64,14 @@ func (dbg *RequestDebugger) Provision(ctx caddy.Context) error {
 	// dbg.logger = ctx.Logger(dbg)
 	if dbg.logger == nil {
 		dbg.logger = initLogger()
+	}
+
+	if dbg.URIFilter != "" {
+		p, err := regexp.CompilePOSIX(dbg.URIFilter)
+		if err != nil {
+			return fmt.Errorf("failed to compile uri_filter %s: %s", dbg.URIFilter, err)
+		}
+		dbg.filterURIPattern = p
 	}
 	return nil
 }
@@ -86,7 +101,12 @@ func (dbg RequestDebugger) ServeHTTP(resp http.ResponseWriter, req *http.Request
 	return next.ServeHTTP(resp, req)
 }
 
-func (dbg *RequestDebugger) debugResponse(req *http.Request, resp caddyhttp.ResponseRecorder) {
+func (dbg *RequestDebugger) debugResponse(req *http.Request, wrapResp caddyhttp.ResponseRecorder) {
+	if dbg.filterURIPattern != nil {
+		if !dbg.filterURIPattern.MatchString(req.RequestURI) {
+			return
+		}
+	}
 	var requestID string
 	direction := "outgoing"
 	rawRequestID := caddyhttp.GetVar(req.Context(), "request_id")
@@ -94,8 +114,8 @@ func (dbg *RequestDebugger) debugResponse(req *http.Request, resp caddyhttp.Resp
 		requestID = rawRequestID.(string)
 	}
 	bufferSize := 0
-	if resp.Buffer() != nil {
-		bufferSize = resp.Buffer().Len()
+	if wrapResp.Buffer() != nil {
+		bufferSize = wrapResp.Buffer().Len()
 	}
 
 	dbg.logger.Debug(
@@ -103,13 +123,19 @@ func (dbg *RequestDebugger) debugResponse(req *http.Request, resp caddyhttp.Resp
 		zap.Any("request_id", requestID),
 		zap.String("direction", direction),
 		zap.String("tag", dbg.Tag),
-		zap.Int("status_code", resp.Status()),
-		zap.Int("response_size", resp.Size()),
+		zap.Int("status_code", wrapResp.Status()),
+		zap.Int("response_size", wrapResp.Size()),
 		zap.Int("buffer_size", bufferSize),
+		zap.Any("response_headers", wrapResp.Header()),
 	)
 }
 
 func (dbg *RequestDebugger) debugRequest(r *http.Request) {
+	if dbg.filterURIPattern != nil {
+		if !dbg.filterURIPattern.MatchString(r.RequestURI) {
+			return
+		}
+	}
 	var requestID string
 	reqDirection := "incoming"
 	rawRequestID := caddyhttp.GetVar(r.Context(), "request_id")
