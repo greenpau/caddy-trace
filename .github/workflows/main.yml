@@ -13,8 +13,8 @@ jobs:
   core:
     strategy:
       matrix:
-        go-version: [1.14.x]
-        platform: [ubuntu-latest]
+        go-version: [1.14.x, 1.15.x]
+        platform: [ubuntu-latest, macos-latest, windows-latest]
     name: Build
     runs-on: ${{ matrix.platform }}
     env:
