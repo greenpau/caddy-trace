@@ -11,7 +11,7 @@ VERBOSE:=-v
 ifdef TEST
 	TEST:="-run ${TEST}"
 endif
-CADDY_VERSION="v2.1.1"
+CADDY_VERSION="v2.4.3"
 
 all:
 	@echo "Version: $(PLUGIN_VERSION), Branch: $(GIT_BRANCH), Revision: $(GIT_COMMIT)"
@@ -21,8 +21,7 @@ all:
 	@rm -rf ../xcaddy-$(PLUGIN_NAME)/*
 	@mkdir -p ../xcaddy-$(PLUGIN_NAME) && cd ../xcaddy-$(PLUGIN_NAME) && \
 		xcaddy build $(CADDY_VERSION) --output ../$(PLUGIN_NAME)/bin/caddy \
-		--with github.com/greenpau/caddy-trace@$(LATEST_GIT_COMMIT)=$(BUILD_DIR) \
-		--with github.com/greenpau/caddy-auth@latest=$(BUILD_DIR)/../caddy-auth
+		--with github.com/greenpau/caddy-trace@$(LATEST_GIT_COMMIT)=$(BUILD_DIR)
 	@#bin/caddy run -environ -config assets/conf/config.json
 
 linter:
