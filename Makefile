@@ -11,7 +11,7 @@ VERBOSE:=-v
 ifdef TEST
 	TEST:="-run ${TEST}"
 endif
-CADDY_VERSION="v2.4.3"
+CADDY_VERSION="v2.5.0"
 
 all:
 	@echo "Version: $(PLUGIN_VERSION), Branch: $(GIT_BRANCH), Revision: $(GIT_COMMIT)"
@@ -59,11 +59,10 @@ qtest: covdir
 
 dep:
 	@echo "Making dependencies check ..."
-	@go get -u golang.org/x/lint/golint
-	@go get -u golang.org/x/tools/cmd/godoc
-	@go get -u github.com/kyoh86/richgo
-	@go get -u github.com/caddyserver/xcaddy/cmd/xcaddy
-	@go get -u github.com/greenpau/versioned/cmd/versioned
+	@go install golang.org/x/lint/golint@latest
+	@go install github.com/kyoh86/richgo@latest
+	@go install github.com/caddyserver/xcaddy/cmd/xcaddy@latest
+	@go install github.com/greenpau/versioned/cmd/versioned@latest
 
 release:
 	@echo "Making release"
