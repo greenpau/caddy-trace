@@ -19,7 +19,7 @@ import (
 	"fmt"
 	"github.com/caddyserver/caddy/v2"
 	"github.com/caddyserver/caddy/v2/modules/caddyhttp"
-	"github.com/satori/go.uuid"
+	"github.com/google/uuid"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"net"
@@ -140,7 +140,7 @@ func (dbg *RequestDebugger) debugRequest(r *http.Request) {
 	reqDirection := "incoming"
 	rawRequestID := caddyhttp.GetVar(r.Context(), "request_id")
 	if rawRequestID == nil {
-		requestID = uuid.NewV4().String()
+		requestID = uuid.New().String()
 		caddyhttp.SetVar(r.Context(), "request_id", requestID)
 	} else {
 		requestID = rawRequestID.(string)

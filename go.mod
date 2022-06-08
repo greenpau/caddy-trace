@@ -3,8 +3,8 @@ module github.com/greenpau/caddy-trace
 go 1.17
 
 require (
-	github.com/caddyserver/caddy/v2 v2.5.0
-	github.com/satori/go.uuid v1.2.0
+	github.com/caddyserver/caddy/v2 v2.5.1
+	github.com/google/uuid v1.3.0
 	go.uber.org/zap v1.21.0
 )
 
@@ -44,7 +44,6 @@ require (
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/golang/snappy v0.0.4 // indirect
 	github.com/google/cel-go v0.7.3 // indirect
-	github.com/google/uuid v1.3.0 // indirect
 	github.com/grpc-ecosystem/grpc-gateway v1.16.0 // indirect
 	github.com/huandu/xstrings v1.3.2 // indirect
 	github.com/imdario/mergo v0.3.12 // indirect
